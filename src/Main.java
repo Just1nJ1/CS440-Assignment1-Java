@@ -10,6 +10,7 @@ public class Main {
     public static int[][] blocked;
     public static Random r = new Random(37);
     public static MathContext m = new MathContext(1);
+    public static Scanner sc = new Scanner(System.in);
 
     public static int[][] read_grids(String filename){
         int[][] blocked = null;
@@ -256,6 +257,36 @@ public class Main {
             }
     }
 
+    public static void query_point(int node_x, int node_y){
+        if (node_x > 0 && node_x <= WIDTH + 1 && node_y > 0 && node_y <= HEIGHT + 1){
+            Node n = nodes[node_y - 1][node_x - 1];
+            System.out.printf("Vertex at %d, %d has g=%4f, h=%4f, f=%4f\n", node_x, node_y, n.getG_value(), n.getH_value(), n.getG_value() + n.getH_value());
+        }
+    }
+
+    public static void input_handler(){
+        String line;
+        while ((line = sc.nextLine()) != null && !"quit".equals(line)){
+            switch (line){
+                case "query":
+                    try {
+                        String[] infos = Arrays.stream(sc.nextLine().split("[, ]", -1)).filter(e -> e.trim().length() > 0).toArray(String[]::new);
+                        if (infos.length == 2) {
+                            int node_x = Integer.parseInt(infos[0]);
+                            int node_y = Integer.parseInt(infos[1]);
+                            query_point(node_x, node_y);
+                        } else {
+                            System.out.println("Please type in only x and y coordinates of a vertex");
+                        }
+                    } catch (NumberFormatException ignored){
+                        System.out.println("Please type in the integer coordinates of a vertex using comma and/or space to split");
+                    }
+                default:
+                    System.out.println("Please type in one of following given option");
+            }
+        }
+    }
+
     public static void main(String[] args) {
         MinHeap heap = new MinHeap();
 //        m.push(new Node(0, 0, 0, 1, null));
@@ -290,6 +321,7 @@ public class Main {
         System.out.println("======================================");
 //        test();
         print_grid();
+        input_handler();
     }
 
     public static void test(){
