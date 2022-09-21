@@ -54,10 +54,10 @@ public class Main {
 
     }
 
-    public static List<Node> a_star(Node[][] nodes){
-        Node start = nodes[START_Y][START_X];
+    public static List<Node> a_star(){
+        Node start = nodes[START_Y - 1][START_X - 1];
         start.setG_value(0);
-        start.setParent(start);
+        start.setParent(null);
         MinHeap fringe = new MinHeap();
         fringe.push(start);
         Set<Node> closed = new HashSet<>();
@@ -65,7 +65,7 @@ public class Main {
             Node s = fringe.pop();
             if (s.getX() == GOAL_X - 1 && s.getY() == GOAL_Y - 1){
                 List<Node> path = new ArrayList<>();
-                for (Node tmp = s; tmp.getParent() != start; tmp = tmp.getParent())
+                for (Node tmp = s; tmp.getParent() != null; tmp = tmp.getParent())
                     path.add(0, tmp);
                 return path;
             }
@@ -125,12 +125,20 @@ public class Main {
             s_.setParent(s);
             if (fringe.contains(s_))
                 fringe.remove(s_);
+            else
+                s_.setH_value(h(s_));
             fringe.push(s_);
         }
     }
 
     public static double c(Node s, Node s_){
         return Math.sqrt(Math.pow(s.getX() - s_.getX(), 2) + Math.pow(s.getY() - s_.getY(), 2));
+    }
+
+    public static double h(Node s_){
+        return Math.sqrt(2) * Math.min(Math.abs(s_.getX() - GOAL_X), Math.abs(s_.getY() - GOAL_Y))
+                + Math.max(Math.abs(s_.getX() - GOAL_X), Math.abs(s_.getY() - GOAL_Y))
+                - Math.min(Math.abs(s_.getX() - GOAL_X), Math.abs(s_.getY() - GOAL_Y));
     }
 
     public static void init_nodes(Node[][] nodes){
@@ -154,16 +162,20 @@ public class Main {
 //        Node n;
 //        while ((n = m.pop()) != null)
 //            System.out.println(n.getG_value() + ", " + n.getH_value());
-        blocked = read_grids("src/test.txt");
+        blocked = read_grids("src/test2.txt");
         nodes = new Node[HEIGHT + 1][WIDTH + 1];
         init_nodes(nodes);
-        for (Node[] ns : nodes)
-            for (Node n : ns)
-                heap.push(n);
-        Node n;
-        heap.remove(nodes[1][1]);
-        while ((n = heap.pop()) != null)
-            System.out.println(n.getG_value() + ", " + n.getH_value() + ", " + (n.getG_value() + n.getH_value()));
+//        for (Node[] ns : nodes)
+//            for (Node n : ns)
+//                heap.push(n);
+//        Node n;
+//        heap.remove(nodes[1][1]);
+//        while ((n = heap.pop()) != null)
+//            System.out.println(n.getG_value() + ", " + n.getH_value() + ", " + (n.getG_value() + n.getH_value()));
+        List<Node> path = a_star();
+        if (path != null)
+            for (Node n : path)
+                System.out.println((n.getX() + 1) + ", " + (n.getY() + 1));
         System.out.println("Here");
 //        test();
     }
