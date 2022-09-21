@@ -1,7 +1,5 @@
 import java.io.*;
-import java.math.BigDecimal;
 import java.math.MathContext;
-import java.text.DecimalFormat;
 import java.util.*;
 
 
@@ -49,15 +47,48 @@ public class Main {
         return blocked;
     }
 
-    // TODO: Complete this method
-    public static void print_grid(){
-
+    public static String[] formatted() {
+        String[][] vertices = new String[HEIGHT + 1][WIDTH + 1];
+        for (int i = 0; i < HEIGHT + 1; i++) {
+            for (int j = 0; j < WIDTH + 1; j++) {
+                vertices[i][j] = (i == START_Y - 1 && j == START_X - 1) ? "S" : (i == GOAL_Y - 1 && j == GOAL_X - 1) ?
+                        "G" : nodes[i][j].getStep() == 0 ? "+" : nodes[i][j].getStep() + "";
+            }
+        }
+        String[] result = new String[HEIGHT + 1];
+        for (int i = 0; i < HEIGHT + 1; i++){
+            result[i] = String.join("---", vertices[i]);
+        }
+        return result;
     }
 
-    public static List<Node> a_star(){
+    public static void print_grid(){
+        String[] lines = formatted();
+        System.out.print("\t");
+        for (int i = 1; i <= WIDTH + 1; i++)
+            System.out.print((i < 100 ? " " : "") + i + (i < 10 ? " " : "") + " ");
+        System.out.println();
+        for (int i = 1; i <= HEIGHT; i++){
+//            System.out.printf("%d\t +" + "---+".repeat(WIDTH) + "\n", i);
+            System.out.printf("%d\t " + lines[i - 1] + "\n", i);
+            System.out.print("\t |");
+            for (int j = 1; j <= WIDTH; j++) {
+                if (blocked[i][j] == 1)
+                    System.out.print(" x ");
+                else
+                    System.out.print("   ");
+                System.out.print("|");
+            }
+            System.out.println();
+        }
+//        System.out.printf("%d\t +" + "-".repeat(WIDTH * 4 - 1) + "+\n", HEIGHT + 1);
+        System.out.printf("%d\t " + lines[HEIGHT] + "\n", HEIGHT + 1);
+    }
+
+    public static List<Node> algo(boolean theta){
         Node start = nodes[START_Y - 1][START_X - 1];
         start.setG_value(0);
-        start.setParent(null);
+        start.setParent(start);
         MinHeap fringe = new MinHeap();
         fringe.push(start);
         Set<Node> closed = new HashSet<>();
@@ -65,14 +96,23 @@ public class Main {
             Node s = fringe.pop();
             if (s.getX() == GOAL_X - 1 && s.getY() == GOAL_Y - 1){
                 List<Node> path = new ArrayList<>();
-                for (Node tmp = s; tmp.getParent() != null; tmp = tmp.getParent())
+                for (Node tmp = s; tmp != start; tmp = tmp.getParent())
                     path.add(0, tmp);
+                for (int i = 0; i < path.size(); i++){
+                    path.get(i).setStep(i + 1);
+                }
                 return path;
             }
             closed.add(s);
             for (Node s_ : successor(s)){
-                if (!closed.contains(s_))
-                    update_vertex(s, s_, fringe);
+                if (!closed.contains(s_)) {
+                    s_.setG_value(Double.MAX_VALUE);
+                    s_.setParent(null);
+                    if (theta)
+                        update_vertex_theta_star(s, s_, fringe);
+                    else
+                        update_vertex_a_star(s, s_, fringe);
+                }
             }
         }
         return null;
@@ -119,7 +159,7 @@ public class Main {
         };
     }
 
-    public static void update_vertex(Node s, Node s_, MinHeap fringe){
+    public static void update_vertex_a_star(Node s, Node s_, MinHeap fringe){
         if (s.getG_value() + c(s, s_) < s_.getG_value()) {
             s_.setG_value(s.getG_value() + c(s, s_));
             s_.setParent(s);
@@ -131,14 +171,81 @@ public class Main {
         }
     }
 
+    public static void update_vertex_theta_star(Node s, Node s_, MinHeap fringe){
+        if (line_of_sight(s.getParent(), s_)) {
+            if (s.getParent().getG_value() + c(s.getParent(), s_) < s_.getG_value()) {
+                s_.setG_value(s.getParent().getG_value() + c(s.getParent(), s_));
+                s_.setParent(s.getParent());
+                if (fringe.contains(s_))
+                    fringe.remove(s_);
+                s_.setH_value(h(s_));
+                fringe.push(s_);
+            }
+        } else {
+            update_vertex_a_star(s, s_, fringe);
+        }
+    }
+
     public static double c(Node s, Node s_){
         return Math.sqrt(Math.pow(s.getX() - s_.getX(), 2) + Math.pow(s.getY() - s_.getY(), 2));
     }
 
     public static double h(Node s_){
-        return Math.sqrt(2) * Math.min(Math.abs(s_.getX() - GOAL_X), Math.abs(s_.getY() - GOAL_Y))
-                + Math.max(Math.abs(s_.getX() - GOAL_X), Math.abs(s_.getY() - GOAL_Y))
-                - Math.min(Math.abs(s_.getX() - GOAL_X), Math.abs(s_.getY() - GOAL_Y));
+        return Math.sqrt(2) * Math.min(Math.abs(s_.getX() - (GOAL_X - 1)), Math.abs(s_.getY() - (GOAL_Y - 1)))
+                + Math.max(Math.abs(s_.getX() - (GOAL_X - 1)), Math.abs(s_.getY() - (GOAL_Y - 1)))
+                - Math.min(Math.abs(s_.getX() - (GOAL_X - 1)), Math.abs(s_.getY() - (GOAL_Y - 1)));
+    }
+
+    public static boolean line_of_sight(Node s, Node s_){
+        int x0 = s.getX();
+        int y0 = s.getY();
+        int x1 = s_.getX();
+        int y1 = s_.getY();
+        int f = 0;
+        int dy = y1 - y0;
+        int dx = x1 - x0;
+        int sx = -1;
+        int sy = -1;
+        if (dy < 0)
+            dy *= -1;
+        else
+            sy = 1;
+        if (dx < 0)
+            dx *= -1;
+        else
+            sx = 1;
+        if (dx >= dy) {
+            while (x0 != x1) {
+                f += dy;
+                if (f >= dx) {
+                    if (blocked[y0 + (sy - 1) / 2 + 1][x0 + (sx - 1) / 2 + 1] == 1)
+                        return false;
+                    y0 += sy;
+                    f -= dx;
+                }
+                if (f != 0 && blocked[y0 + (sy - 1) / 2 + 1][x0 + (sx - 1) / 2 + 1] == 1)
+                    return false;
+                if (dy == 0 && blocked[y0 + 1][x0 + (sx - 1) / 2 + 1] == 1 && blocked[y0 - 1 + 1][x0 + (sx - 1) / 2 + 1] == 1)
+                    return false;
+                x0 += sx;
+            }
+        } else {
+            while (y0 != y1) {
+                f += dx;
+                if (f >= dy) {
+                    if (blocked[y0 + (sy - 1) / 2 + 1][x0 + (sx - 1) / 2 + 1] == 1)
+                        return false;
+                    x0 += sx;
+                    f -= dy;
+                }
+                if (f != 0 && blocked[y0 + (sy - 1) / 2 + 1][x0 + (sx - 1) / 2 + 1] == 1)
+                    return false;
+                if (dx == 0 && blocked[y0 + (sy - 1) / 2 + 1][x0 + 1] == 1 && blocked[y0 + (sy - 1) / 2 + 1][x0 - 1 + 1] == 1)
+                    return false;
+                y0 += sy;
+            }
+        }
+        return true;
     }
 
     public static void init_nodes(Node[][] nodes){
@@ -172,12 +279,17 @@ public class Main {
 //        heap.remove(nodes[1][1]);
 //        while ((n = heap.pop()) != null)
 //            System.out.println(n.getG_value() + ", " + n.getH_value() + ", " + (n.getG_value() + n.getH_value()));
-        List<Node> path = a_star();
+        List<Node> path = algo(true);
         if (path != null)
             for (Node n : path)
                 System.out.println((n.getX() + 1) + ", " + (n.getY() + 1));
-        System.out.println("Here");
+//        List<Node> path2 = algo(false);
+//        if (path2 != null)
+//            for (Node n : path2)
+//                System.out.println((n.getX() + 1) + ", " + (n.getY() + 1));
+        System.out.println("======================================");
 //        test();
+        print_grid();
     }
 
     public static void test(){

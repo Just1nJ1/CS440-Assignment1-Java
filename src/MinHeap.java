@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MinHeap {
-    private List<Node> heap;
+    private final List<Node> heap;
     private int size;
 
     public MinHeap(){
@@ -79,7 +79,9 @@ public class MinHeap {
         int i = heap.indexOf(n);
         heap.set(i, heap.get(size - 1));
         heap.remove(--size);
-        fix_up(i);
-        fix_down(i);
+        if (i != size) {
+            fix_up(i);
+            fix_down(i);
+        }
     }
 }

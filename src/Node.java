@@ -2,6 +2,7 @@ public class Node {
     private final int x, y;
     private Node parent;
     private double g_value, h_value;
+    private int step;
 
     public Node(int x, int y, double g_value, double h_value, Node parent) {
         this.x = x;
@@ -9,6 +10,7 @@ public class Node {
         this.g_value = g_value;
         this.h_value = h_value;
         this.parent = parent;
+        this.step = 0;
     }
 
 //    @Override
@@ -61,6 +63,14 @@ public class Node {
 
     public void setH_value(double h_value) {
         this.h_value = h_value;
+    }
+
+    public int getStep() {
+        return step;
+    }
+
+    public void setStep(int step) {
+        this.step = step;
     }
 
     public int getX() {
