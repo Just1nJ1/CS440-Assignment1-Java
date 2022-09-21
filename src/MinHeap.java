@@ -11,7 +11,10 @@ public class MinHeap {
     }
 
     public int fix_down(){
-        int i = 0;
+        return fix_down(0);
+    }
+
+    public int fix_down(int i){
         int j;
         while((j = (i << 1) + 1) < size){
             if (heap.get(j).greater(heap.get(i)))
@@ -27,8 +30,11 @@ public class MinHeap {
         return i;
     }
 
-    public int fix_up(){
-        int i = size - 1;
+    public int fix_up() {
+        return fix_up(size - 1);
+    }
+
+    public int fix_up(int i){
         int j;
         while ((j = (i - 1) >> 1) >= 0){
             if (heap.get(i).greater(heap.get(j)))
@@ -67,5 +73,13 @@ public class MinHeap {
 
     public boolean contains(Node n){
         return heap.contains(n);
+    }
+
+    public void remove(Node n){
+        int i = heap.indexOf(n);
+        heap.set(i, heap.get(size - 1));
+        heap.remove(--size);
+        fix_up(i);
+        fix_down(i);
     }
 }

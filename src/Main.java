@@ -1,8 +1,8 @@
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.text.DecimalFormat;
+import java.util.*;
 
 
 public class Main {
@@ -10,6 +10,8 @@ public class Main {
     public static int START_X, START_Y, GOAL_X, GOAL_Y;
     public static Node[][] nodes;
     public static int[][] blocked;
+    public static Random r = new Random(37);
+    public static MathContext m = new MathContext(1);
 
     public static int[][] read_grids(String filename){
         int[][] blocked = null;
@@ -70,7 +72,7 @@ public class Main {
             closed.add(s);
             for (Node s_ : successor(s)){
                 if (!closed.contains(s_))
-                    update_vertex(s, s_);
+                    update_vertex(s, s_, fringe);
             }
         }
         return null;
@@ -79,24 +81,20 @@ public class Main {
     public static List<Node> successor(Node s){
         int x = s.getX(), y = s.getY();
         List<Node> result = new ArrayList<>();
-        if (x != 0) {
-            result.add(nodes[y][x - 1]);
-            if (y != 0)
-                result.add(nodes[y - 1][x - 1]);
-            if (y != HEIGHT - 1)
-                result.add(nodes[y + 1][x - 1]);
+        for (int i = 0; i < 8; i ++){
+            if (check(x, y, i))
+                result.add(switch (i){
+                    case 0 -> nodes[y]    [x + 1];
+                    case 1 -> nodes[y - 1][x + 1];
+                    case 2 -> nodes[y - 1][x];
+                    case 3 -> nodes[y - 1][x - 1];
+                    case 4 -> nodes[y]    [x - 1];
+                    case 5 -> nodes[y + 1][x - 1];
+                    case 6 -> nodes[y + 1][x];
+                    case 7 -> nodes[y + 1][x + 1];
+                    default -> null;
+                });
         }
-        if (x != WIDTH - 1) {
-            result.add(nodes[y][x + 1]);
-            if (y != 0)
-                result.add(nodes[y - 1][x + 1]);
-            if (y != HEIGHT - 1)
-                result.add(nodes[y + 1][x + 1]);
-        }
-        if (y != 0)
-            result.add(nodes[y - 1][x]);
-        if (y != HEIGHT - 1)
-            result.add(nodes[y + 1][x]);
         return result;
     }
 
@@ -121,40 +119,58 @@ public class Main {
         };
     }
 
-    public static void update_vertex(Node s, Node s_){
-
-    }
-
-    public static void init_nodes(Node[][] nodes){
-        for (int y = 0; y < HEIGHT + 1; y++) {
-            for (int x = 0; x < WIDTH + 1; x++) {
-                nodes[y][x] = new Node(x, y, Double.MAX_VALUE, Double.MAX_VALUE, null);
-            }
+    public static void update_vertex(Node s, Node s_, MinHeap fringe){
+        if (s.getG_value() + c(s, s_) < s_.getG_value()) {
+            s_.setG_value(s.getG_value() + c(s, s_));
+            s_.setParent(s);
+            if (fringe.contains(s_))
+                fringe.remove(s_);
+            fringe.push(s_);
         }
     }
 
+    public static double c(Node s, Node s_){
+        return Math.sqrt(Math.pow(s.getX() - s_.getX(), 2) + Math.pow(s.getY() - s_.getY(), 2));
+    }
+
+    public static void init_nodes(Node[][] nodes){
+        for (int y = 0; y < HEIGHT + 1; y++)
+            for (int x = 0; x < WIDTH + 1; x++) {
+//                nodes[y][x] = new Node(x, y, new BigDecimal(r.nextDouble(), m).doubleValue(), new BigDecimal(r.nextDouble(), m).doubleValue(), null);
+                nodes[y][x] = new Node(x, y, Double.MAX_VALUE, Double.MAX_VALUE, null);
+            }
+    }
+
     public static void main(String[] args) {
-//        MinHeap m = new MinHeap();
-//        m.push(new Node(0, 0, 0, 1, 0));
-//        m.push(new Node(0, 0, 1, 1, 0));
-//        m.push(new Node(0, 0, 2, 0, 0));
-//        m.push(new Node(0, 0, 0, 0, 0));
-//        m.push(new Node(0, 0, 2, 4, 0));
-//        m.push(new Node(0, 0, 2, 2, 0));
-//        m.push(new Node(0, 0, 2, 5, 0));
-//        m.push(new Node(0, 0, 0, 3, 0));
+        MinHeap heap = new MinHeap();
+//        m.push(new Node(0, 0, 0, 1, null));
+//        m.push(new Node(0, 0, 1, 1, null));
+//        m.push(new Node(0, 0, 2, 0, null));
+//        m.push(new Node(0, 0, 0, 0, null));
+//        m.push(new Node(0, 0, 2, 4, null));
+//        m.push(new Node(0, 0, 2, 2, null));
+//        m.push(new Node(0, 0, 2, 5, null));
+//        m.push(new Node(0, 0, 0, 3, null));
 //        Node n;
 //        while ((n = m.pop()) != null)
 //            System.out.println(n.getG_value() + ", " + n.getH_value());
         blocked = read_grids("src/test.txt");
         nodes = new Node[HEIGHT + 1][WIDTH + 1];
         init_nodes(nodes);
-        test();
+        for (Node[] ns : nodes)
+            for (Node n : ns)
+                heap.push(n);
+        Node n;
+        heap.remove(nodes[1][1]);
+        while ((n = heap.pop()) != null)
+            System.out.println(n.getG_value() + ", " + n.getH_value() + ", " + (n.getG_value() + n.getH_value()));
+        System.out.println("Here");
+//        test();
     }
 
     public static void test(){
-        for (int i = 0; i < 8; i++) {
-            System.out.println(check(2, 1, i));
-        }
+        Node n = nodes[1][2];
+        for (Node na : successor(n))
+            System.out.println(na.getX() + ", " + na.getY());
     }
 }
