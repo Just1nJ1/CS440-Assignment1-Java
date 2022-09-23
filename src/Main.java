@@ -52,8 +52,8 @@ public class Main {
         String[][] vertices = new String[HEIGHT + 1][WIDTH + 1];
         for (int i = 0; i < HEIGHT + 1; i++) {
             for (int j = 0; j < WIDTH + 1; j++) {
-                vertices[i][j] = (i == START_Y - 1 && j == START_X - 1) ? "S" : (i == GOAL_Y - 1 && j == GOAL_X - 1) ?
-                        "G" : nodes[i][j].getStep() == 0 ? "+" : nodes[i][j].getStep() + "";
+                vertices[i][j] = (i == START_Y - 1 && j == START_X - 1) ? START_X == GOAL_X && START_Y == GOAL_Y ? "SG" : "SP" : (i == GOAL_Y - 1 && j == GOAL_X - 1) ?
+                        "GP" : nodes[i][j].getStep() == 0 ? "++" : String.format("%02d", nodes[i][j].getStep());
             }
         }
         String[] result = new String[HEIGHT + 1];
@@ -72,13 +72,13 @@ public class Main {
         for (int i = 1; i <= HEIGHT; i++){
 //            System.out.printf("%d\t +" + "---+".repeat(WIDTH) + "\n", i);
             System.out.printf("%d\t " + lines[i - 1] + "\n", i);
-            System.out.print("\t |");
+            System.out.print("\t ||");
             for (int j = 1; j <= WIDTH; j++) {
                 if (blocked[i][j] == 1)
                     System.out.print(" x ");
                 else
                     System.out.print("   ");
-                System.out.print("|");
+                System.out.print("||");
             }
             System.out.println();
         }
@@ -304,7 +304,7 @@ public class Main {
 //        Node n;
 //        while ((n = m.pop()) != null)
 //            System.out.println(n.getG_value() + ", " + n.getH_value());
-        blocked = read_grids("src/0.txt");
+        blocked = read_grids("src/Grids/0.txt");
         nodes = new Node[HEIGHT + 1][WIDTH + 1];
         init_nodes(nodes);
 //        for (Node[] ns : nodes)
