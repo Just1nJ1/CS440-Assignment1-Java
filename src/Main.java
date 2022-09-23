@@ -67,7 +67,7 @@ public class Main {
         String[] lines = formatted();
         System.out.print("\t");
         for (int i = 1; i <= WIDTH + 1; i++)
-            System.out.print((i < 100 ? " " : "") + i + (i < 10 ? " " : "") + " ");
+            System.out.print((i < 100 ? " " : "") + i + (i < 10 ? " " : "") + "  ");
         System.out.println();
         for (int i = 1; i <= HEIGHT; i++){
 //            System.out.printf("%d\t +" + "---+".repeat(WIDTH) + "\n", i);
@@ -84,6 +84,35 @@ public class Main {
         }
 //        System.out.printf("%d\t +" + "-".repeat(WIDTH * 4 - 1) + "+\n", HEIGHT + 1);
         System.out.printf("%d\t " + lines[HEIGHT] + "\n", HEIGHT + 1);
+    }
+
+    public static void print_grid(String filename){
+        try {
+            PrintWriter pw = new PrintWriter(new FileWriter(filename));
+            String[] lines = formatted();
+            pw.print("\t");
+            for (int i = 1; i <= WIDTH + 1; i++)
+                pw.print((i < 100 ? " " : "") + i + (i < 10 ? " " : "") + "  ");
+            pw.println();
+            for (int i = 1; i <= HEIGHT; i++){
+//            System.out.printf("%d\t +" + "---+".repeat(WIDTH) + "\n", i);
+                pw.printf("%d\t " + lines[i - 1] + "\n", i);
+                pw.print("\t ||");
+                for (int j = 1; j <= WIDTH; j++) {
+                    if (blocked[i][j] == 1)
+                        pw.print(" x ");
+                    else
+                        pw.print("   ");
+                    pw.print("||");
+                }
+                pw.println();
+            }
+//        System.out.printf("%d\t +" + "-".repeat(WIDTH * 4 - 1) + "+\n", HEIGHT + 1);
+            pw.printf("%d\t " + lines[HEIGHT] + "\n", HEIGHT + 1);
+            pw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static List<Node> algo(boolean theta){
@@ -107,8 +136,10 @@ public class Main {
             closed.add(s);
             for (Node s_ : successor(s)){
                 if (!closed.contains(s_)) {
-                    s_.setG_value(Double.MAX_VALUE);
-                    s_.setParent(null);
+                    if (!fringe.contains(s_)) {
+                        s_.setG_value(Double.MAX_VALUE);
+                        s_.setParent(null);
+                    }
                     if (theta)
                         update_vertex_theta_star(s, s_, fringe);
                     else
@@ -166,8 +197,7 @@ public class Main {
             s_.setParent(s);
             if (fringe.contains(s_))
                 fringe.remove(s_);
-            else
-                s_.setH_value(h(s_));
+            s_.setH_value(h(s_));
             fringe.push(s_);
         }
     }
@@ -284,6 +314,35 @@ public class Main {
                         System.out.println("Please type in the integer coordinates of a vertex separated by using comma and/or space");
                     }
                     break;
+                case "parent":
+                    try {
+//                        System.out.println("Which vertex you want to query? Type x and y coordinates separated by using comma and/or space");
+                        String[] infos = Arrays.stream(sc.nextLine().split("[, ]", -1)).filter(e -> e.trim().length() > 0).toArray(String[]::new);
+                        if (infos.length == 2) {
+                            int node_x = Integer.parseInt(infos[0]);
+                            int node_y = Integer.parseInt(infos[1]);
+                            System.out.println("Parent node vertex: " + nodes[node_y - 1][node_x - 1].getParent().getX() + ", " + nodes[node_y - 1][node_x - 1].getParent().getY());
+                        } else {
+//                            System.out.println("Please type in only x and y coordinates of a vertex");
+                        }
+                    } catch (NumberFormatException ignored){
+//                        System.out.println("Please type in the integer coordinates of a vertex separated by using comma and/or space");
+                    }
+                    break;
+//                case "n":
+//                    try {
+//                        String[] infos = Arrays.stream(sc.nextLine().split("[, ]", -1)).filter(e -> e.trim().length() > 0).toArray(String[]::new);
+//                        if (infos.length == 2) {
+//                            int node_x = Integer.parseInt(infos[0]);
+//                            int node_y = Integer.parseInt(infos[1]);
+//                            System.out.println("Neighbors node vertex: ");
+//                            for (int i = 0; i < 8; i++){
+//                                System.out.println(check());
+//                            }
+//                        }
+//                    } catch (NumberFormatException ignored){
+//                    }
+//                    break;
                 default:
                     System.out.println("Please type in one of following given option");
             }
@@ -314,7 +373,7 @@ public class Main {
 //        heap.remove(nodes[1][1]);
 //        while ((n = heap.pop()) != null)
 //            System.out.println(n.getG_value() + ", " + n.getH_value() + ", " + (n.getG_value() + n.getH_value()));
-        List<Node> path = algo(false);
+        List<Node> path = algo(true);
         if (path != null)
             for (Node n : path)
                 System.out.println(n);
@@ -325,6 +384,7 @@ public class Main {
         System.out.println("======================================");
 //        test();
         print_grid();
+        print_grid("src/Outputs/0.txt");
         input_handler();
     }
 
