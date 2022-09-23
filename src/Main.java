@@ -260,16 +260,18 @@ public class Main {
     public static void query_point(int node_x, int node_y){
         if (node_x > 0 && node_x <= WIDTH + 1 && node_y > 0 && node_y <= HEIGHT + 1){
             Node n = nodes[node_y - 1][node_x - 1];
-            System.out.printf("Vertex at %d, %d has g=%4f, h=%4f, f=%4f\n", node_x, node_y, n.getG_value(), n.getH_value(), n.getG_value() + n.getH_value());
+            System.out.printf("Vertex at %d, %d has g=%.2e, h=%.2e, f=%.2e\n", node_x, node_y, n.getG_value(), n.getH_value(), n.getG_value() + n.getH_value());
         }
     }
 
     public static void input_handler(){
         String line;
+        System.out.println("Type \"query\" to see vertex's values \nType \"quit\" when stop query");
         while ((line = sc.nextLine()) != null && !"quit".equals(line)){
             switch (line){
                 case "query":
                     try {
+                        System.out.println("Which vertex you want to query? Type x and y coordinates separated by using comma and/or space");
                         String[] infos = Arrays.stream(sc.nextLine().split("[, ]", -1)).filter(e -> e.trim().length() > 0).toArray(String[]::new);
                         if (infos.length == 2) {
                             int node_x = Integer.parseInt(infos[0]);
@@ -279,11 +281,13 @@ public class Main {
                             System.out.println("Please type in only x and y coordinates of a vertex");
                         }
                     } catch (NumberFormatException ignored){
-                        System.out.println("Please type in the integer coordinates of a vertex using comma and/or space to split");
+                        System.out.println("Please type in the integer coordinates of a vertex separated by using comma and/or space");
                     }
+                    break;
                 default:
                     System.out.println("Please type in one of following given option");
             }
+            System.out.println("Type \"query\" to see vertex's values \nType \"quit\" when stop query");
         }
     }
 
@@ -300,7 +304,7 @@ public class Main {
 //        Node n;
 //        while ((n = m.pop()) != null)
 //            System.out.println(n.getG_value() + ", " + n.getH_value());
-        blocked = read_grids("src/test2.txt");
+        blocked = read_grids("src/0.txt");
         nodes = new Node[HEIGHT + 1][WIDTH + 1];
         init_nodes(nodes);
 //        for (Node[] ns : nodes)
@@ -310,10 +314,10 @@ public class Main {
 //        heap.remove(nodes[1][1]);
 //        while ((n = heap.pop()) != null)
 //            System.out.println(n.getG_value() + ", " + n.getH_value() + ", " + (n.getG_value() + n.getH_value()));
-        List<Node> path = algo(true);
+        List<Node> path = algo(false);
         if (path != null)
             for (Node n : path)
-                System.out.println((n.getX() + 1) + ", " + (n.getY() + 1));
+                System.out.println(n);
 //        List<Node> path2 = algo(false);
 //        if (path2 != null)
 //            for (Node n : path2)

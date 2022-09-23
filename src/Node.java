@@ -80,4 +80,9 @@ public class Node {
     public int getY() {
         return y;
     }
+
+    @Override
+    public String toString() {
+        return "(" + (x + 1) + ", " + (y + 1) + ")";
+    }
 }
