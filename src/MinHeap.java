@@ -5,38 +5,37 @@ public class MinHeap {
     private final List<Node> heap;
     private int size;
 
-    public MinHeap(){
+    public MinHeap() {
         heap = new ArrayList<>();
         size = 0;
     }
 
-    public int fix_down(){
-        return fix_down(0);
+    public void fix_down() {
+        fix_down(0);
     }
 
-    public int fix_down(int i){
+    public void fix_down(int i) {
         int j;
-        while((j = (i << 1) + 1) < size){
+        while ((j = (i << 1) + 1) < size) {
             if (heap.get(j).greater(heap.get(i)))
                 break;
             if (j < size - 1)
                 if (heap.get(j).greater(heap.get(j + 1)))
-                    j ++;
+                    j++;
             Node temp = heap.get(i);
             heap.set(i, heap.get(j));
             heap.set(j, temp);
             i = j;
         }
-        return i;
     }
 
-    public int fix_up() {
-        return fix_up(size - 1);
+    public void fix_up() {
+        fix_up(size - 1);
     }
 
-    public int fix_up(int i){
+    public void fix_up(int i) {
         int j;
-        while ((j = (i - 1) >> 1) >= 0){
+        while ((j = (i - 1) >> 1) >= 0) {
             if (heap.get(i).greater(heap.get(j)))
                 break;
             Node temp = heap.get(i);
@@ -44,7 +43,6 @@ public class MinHeap {
             heap.set(j, temp);
             i = j;
         }
-        return i;
     }
 
     public Node pop(){
@@ -61,10 +59,10 @@ public class MinHeap {
         return n;
     }
 
-    public int push(Node node){
+    public void push(Node node) {
         heap.add(node);
-        size ++;
-        return fix_up();
+        size++;
+        fix_up();
     }
 
     public boolean empty(){

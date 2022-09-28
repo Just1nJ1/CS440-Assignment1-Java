@@ -13,7 +13,8 @@ public class GridGenerator {
         for (int label = 0; label < 50; label++) {
             try {
                 PrintWriter pw = new PrintWriter(new FileWriter("src/Grids/" + label + ".txt"), true);
-                int start_x = random.nextInt(WIDTH + 1) + 1, start_y = random.nextInt(HEIGHT + 1) + 1, goal_x = random.nextInt(WIDTH + 1) + 1, goal_y = random.nextInt(HEIGHT + 1) + 1;
+                int start_x = random.nextInt(WIDTH + 1) + 1, start_y = random.nextInt(HEIGHT + 1) + 1,
+                        goal_x = random.nextInt(WIDTH + 1) + 1, goal_y = random.nextInt(HEIGHT + 1) + 1;
                 pw.println(start_x + " " + start_y);
                 pw.println(goal_x + " " + goal_y);
                 pw.println(WIDTH + " " + HEIGHT);
@@ -22,7 +23,7 @@ public class GridGenerator {
                         int rand = ((WIDTH - i) * HEIGHT) + HEIGHT - j + 1 <= needed - count ? 0 : random.nextInt(10);
                         if (rand == 0) {
                             pw.println((i + 1) + " " + (j + 1) + " " + 1);
-                            count ++;
+                            count++;
                         }
                         else
                             pw.println((i + 1) + " " + (j + 1) + " " + 0);

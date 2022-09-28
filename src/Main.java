@@ -1,5 +1,4 @@
 import java.io.*;
-import java.math.MathContext;
 import java.util.*;
 
 
@@ -8,8 +7,6 @@ public class Main {
     public int START_X, START_Y, GOAL_X, GOAL_Y;
     public Node[][] nodes;
     public int[][] blocked;
-    public Random r = new Random(37);
-    public MathContext m = new MathContext(1);
     public static Scanner sc = new Scanner(System.in);
 
     public int[][] read_grids(String filename){
@@ -70,7 +67,6 @@ public class Main {
             System.out.print((i < 100 ? " " : "") + i + (i < 10 ? " " : "") + "  ");
         System.out.println();
         for (int i = 1; i <= HEIGHT; i++){
-//            System.out.printf("%d\t +" + "---+".repeat(WIDTH) + "\n", i);
             System.out.printf("%d\t " + lines[i - 1] + "\n", i);
             System.out.print("\t ||");
             for (int j = 1; j <= WIDTH; j++) {
@@ -82,7 +78,6 @@ public class Main {
             }
             System.out.println();
         }
-//        System.out.printf("%d\t +" + "-".repeat(WIDTH * 4 - 1) + "+\n", HEIGHT + 1);
         System.out.printf("%d\t " + lines[HEIGHT] + "\n", HEIGHT + 1);
     }
 
@@ -107,7 +102,6 @@ public class Main {
                 }
                 pw.println();
             }
-//        System.out.printf("%d\t +" + "-".repeat(WIDTH * 4 - 1) + "+\n", HEIGHT + 1);
             pw.printf("%d\t " + lines[HEIGHT] + "\n", HEIGHT + 1);
             pw.close();
         } catch (IOException e) {
@@ -287,18 +281,36 @@ public class Main {
             }
     }
 
-    public void query_point(int node_x, int node_y){
-        if (node_x > 0 && node_x <= WIDTH + 1 && node_y > 0 && node_y <= HEIGHT + 1){
+    public void query_point(int node_x, int node_y) {
+        if (node_x > 0 && node_x <= WIDTH + 1 && node_y > 0 && node_y <= HEIGHT + 1) {
             Node n = nodes[node_y - 1][node_x - 1];
             System.out.printf("Vertex at %d, %d has g=%.2e, h=%.2e, f=%.2e\n", node_x, node_y, n.getG_value(), n.getH_value(), n.getG_value() + n.getH_value());
         }
     }
 
-    public void input_handler(){
+    public static void main(String[] args) {
+        System.out.println("Input Grid file: ");
+        String filename = sc.nextLine();
+        Main m = new Main(filename);
+        List<Node> path = m.algo(false);
+        if (path != null) {
+            System.out.printf("Start (%d, %d) -> ", m.START_X, m.START_Y);
+            for (Node n : path)
+                System.out.print(n + " -> ");
+            System.out.printf("(%d, %d) Goal\n", m.GOAL_X, m.GOAL_Y);
+            m.print_grid();
+            m.print_grid(filename + ".out");
+            m.input_handler();
+        } else {
+            System.out.println("There is no valid path exist.");
+        }
+    }
+
+    public void input_handler() {
         String line;
         System.out.println("Type \"query\" to see vertex's values \nType \"quit\" when stop query");
-        while ((line = sc.nextLine()) != null && !"quit".equals(line)){
-            switch (line){
+        while ((line = sc.nextLine()) != null && !"quit".equals(line)) {
+            switch (line) {
                 case "query":
                     try {
                         System.out.println("Which vertex you want to query? Type x and y coordinates separated by using comma and/or space");
@@ -316,33 +328,15 @@ public class Main {
                     break;
                 case "parent":
                     try {
-//                        System.out.println("Which vertex you want to query? Type x and y coordinates separated by using comma and/or space");
                         String[] infos = Arrays.stream(sc.nextLine().split("[, ]", -1)).filter(e -> e.trim().length() > 0).toArray(String[]::new);
                         if (infos.length == 2) {
                             int node_x = Integer.parseInt(infos[0]);
                             int node_y = Integer.parseInt(infos[1]);
                             System.out.println("Parent node vertex: " + nodes[node_y - 1][node_x - 1].getParent().getX() + ", " + nodes[node_y - 1][node_x - 1].getParent().getY());
-                        } else {
-//                            System.out.println("Please type in only x and y coordinates of a vertex");
                         }
-                    } catch (NumberFormatException ignored){
-//                        System.out.println("Please type in the integer coordinates of a vertex separated by using comma and/or space");
+                    } catch (NumberFormatException ignored) {
                     }
                     break;
-//                case "n":
-//                    try {
-//                        String[] infos = Arrays.stream(sc.nextLine().split("[, ]", -1)).filter(e -> e.trim().length() > 0).toArray(String[]::new);
-//                        if (infos.length == 2) {
-//                            int node_x = Integer.parseInt(infos[0]);
-//                            int node_y = Integer.parseInt(infos[1]);
-//                            System.out.println("Neighbors node vertex: ");
-//                            for (int i = 0; i < 8; i++){
-//                                System.out.println(check());
-//                            }
-//                        }
-//                    } catch (NumberFormatException ignored){
-//                    }
-//                    break;
                 default:
                     System.out.println("Please type in one of following given option");
             }
@@ -350,48 +344,9 @@ public class Main {
         }
     }
 
-    public static void main(String[] args) {
-        System.out.println("Input Grid file: ");
-        String filename = sc.nextLine();
-//        blocked = read_grids(filename);
-//        nodes = new Node[HEIGHT + 1][WIDTH + 1];
-//        init_nodes(nodes);
-//        List<Node> path = algo(false);
-//        if (path != null) {
-//            System.out.printf("Start (%d, %d) -> ", START_X, START_Y);
-//            for (Node n : path)
-//                System.out.print(n + " -> ");
-//            System.out.printf("(%d, %d) Goal\n", GOAL_X, GOAL_Y);
-//            print_grid();
-//            print_grid("src/Outputs/0.txt");
-//            input_handler();
-//        } else {
-//            System.out.println("There is no valid path exist.");
-//        }
-        Main m = new Main(filename);
-        List<Node> path = m.algo(false);
-        if (path != null) {
-            System.out.printf("Start (%d, %d) -> ", m.START_X, m.START_Y);
-            for (Node n : path)
-                System.out.print(n + " -> ");
-            System.out.printf("(%d, %d) Goal\n", m.GOAL_X, m.GOAL_Y);
-            m.print_grid();
-            m.print_grid(filename + ".out");
-//            input_handler();
-        } else {
-            System.out.println("There is no valid path exist.");
-        }
-    }
-
     public Main(String filename){
         blocked = read_grids(filename);
         nodes = new Node[HEIGHT + 1][WIDTH + 1];
         init_nodes(nodes);
-    }
-
-    public void test(){
-        Node n = nodes[1][2];
-        for (Node na : successor(n))
-            System.out.println(na.getX() + ", " + na.getY());
     }
 }

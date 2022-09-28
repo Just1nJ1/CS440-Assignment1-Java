@@ -13,28 +13,6 @@ public class Node {
         this.step = 0;
     }
 
-//    @Override
-//    public boolean equals(Object o) {
-//        if (this == o) return true;
-//        if (o == null || getClass() != o.getClass()) return false;
-//
-//        Node node = (Node) o;
-//
-//        if (Double.compare(node.g_value, g_value) != 0) return false;
-//        return Double.compare(node.h_value, h_value) == 0;
-//    }
-//
-//    @Override
-//    public int hashCode() {
-//        int result;
-//        long temp;
-//        temp = Double.doubleToLongBits(g_value);
-//        result = (int) (temp ^ (temp >>> 32));
-//        temp = Double.doubleToLongBits(h_value);
-//        result = 31 * result + (int) (temp ^ (temp >>> 32));
-//        return result;
-//    }
-
     public boolean greater(Node n){
         if (h_value + g_value == n.h_value + n.g_value)
             return h_value > n.h_value;
