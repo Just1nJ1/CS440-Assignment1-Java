@@ -9,40 +9,10 @@ public class Main {
     public int[][] blocked;
     public static Scanner sc = new Scanner(System.in);
 
-    public int[][] read_grids(String filename){
-        int[][] blocked = null;
-        try (BufferedReader br = new BufferedReader(new FileReader(filename))){
-            String[] start = br.readLine().split(" ");
-            START_X = Integer.parseInt(start[0]);
-            START_Y = Integer.parseInt(start[1]);
-
-            String[] goal = br.readLine().split(" ");
-            GOAL_X = Integer.parseInt(goal[0]);
-            GOAL_Y = Integer.parseInt(goal[1]);
-
-            String[] size = br.readLine().split(" ");
-            WIDTH = Integer.parseInt(size[0]);
-            HEIGHT = Integer.parseInt(size[1]);
-            blocked = new int[HEIGHT + 2][WIDTH + 2];
-            for (String line; (line = br.readLine()) != null;){
-                String[] infos = line.split(" ");
-                int x = Integer.parseInt(infos[0]);
-                int y = Integer.parseInt(infos[1]);
-                int b = Integer.parseInt(infos[2]);
-                blocked[y][x] = b;
-            }
-            for (int i = 0; i < WIDTH + 2; i ++) {
-                blocked[0][i] = 1;
-                blocked[HEIGHT + 1][i] = 1;
-            }
-            for (int i = 0; i < HEIGHT + 2; i ++) {
-                blocked[i][0] = 1;
-                blocked[i][WIDTH + 1] = 1;
-            }
-        } catch (IOException e) {
-            System.err.println("Cannot read given file");
-        }
-        return blocked;
+    public Main(String filename) throws IOException {
+        blocked = read_grids(filename);
+        nodes = new Node[HEIGHT + 1][WIDTH + 1];
+        init_nodes(nodes);
     }
 
     public String[] formatted() {
@@ -291,8 +261,16 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("Input Grid file: ");
         String filename = sc.nextLine();
-        Main m = new Main(filename);
-        List<Node> path = m.algo(false);
+        Main m;
+        try {
+            m = new Main(filename);
+        } catch (IOException e) {
+            System.err.println("Cannot Read given file");
+            return;
+        }
+        System.out.println("Which Algorithm? (\"a\" for a star; \"theta\" for theta star)");
+        String algo = sc.nextLine();
+        List<Node> path = m.algo("theta".equals(algo));
         if (path != null) {
             System.out.printf("Start (%d, %d) -> ", m.START_X, m.START_Y);
             for (Node n : path)
@@ -344,9 +322,39 @@ public class Main {
         }
     }
 
-    public Main(String filename){
-        blocked = read_grids(filename);
-        nodes = new Node[HEIGHT + 1][WIDTH + 1];
-        init_nodes(nodes);
+    public int[][] read_grids(String filename) throws IOException {
+        int[][] blocked = null;
+        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+            String[] start = br.readLine().split(" ");
+            START_X = Integer.parseInt(start[0]);
+            START_Y = Integer.parseInt(start[1]);
+
+            String[] goal = br.readLine().split(" ");
+            GOAL_X = Integer.parseInt(goal[0]);
+            GOAL_Y = Integer.parseInt(goal[1]);
+
+            String[] size = br.readLine().split(" ");
+            WIDTH = Integer.parseInt(size[0]);
+            HEIGHT = Integer.parseInt(size[1]);
+            blocked = new int[HEIGHT + 2][WIDTH + 2];
+            for (String line; (line = br.readLine()) != null; ) {
+                String[] infos = line.split(" ");
+                int x = Integer.parseInt(infos[0]);
+                int y = Integer.parseInt(infos[1]);
+                int b = Integer.parseInt(infos[2]);
+                blocked[y][x] = b;
+            }
+            for (int i = 0; i < WIDTH + 2; i++) {
+                blocked[0][i] = 1;
+                blocked[HEIGHT + 1][i] = 1;
+            }
+            for (int i = 0; i < HEIGHT + 2; i++) {
+                blocked[i][0] = 1;
+                blocked[i][WIDTH + 1] = 1;
+            }
+        } catch (IOException e) {
+            throw new IOException("No such file");
+        }
+        return blocked;
     }
 }

@@ -2,17 +2,20 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Random;
+import java.util.Scanner;
 
 public class GridGenerator {
-    public static Random random = new Random(37);
+    public static Random random = new Random();
     public static final int WIDTH = 100, HEIGHT = 50;
     public static final double PERCENT = 0.1;
 
     public static void main(String[] args) {
-        int count = 0, needed = (int)(WIDTH * HEIGHT * PERCENT);
+        int count = 0, needed = (int) (WIDTH * HEIGHT * PERCENT);
+        System.out.println("Output folder (ended with /): ");
+        String path = new Scanner(System.in).nextLine();
         for (int label = 0; label < 50; label++) {
             try {
-                PrintWriter pw = new PrintWriter(new FileWriter("src/Grids/" + label + ".txt"), true);
+                PrintWriter pw = new PrintWriter(new FileWriter(path + "Grid" + label + ".txt"), true);
                 int start_x = random.nextInt(WIDTH + 1) + 1, start_y = random.nextInt(HEIGHT + 1) + 1,
                         goal_x = random.nextInt(WIDTH + 1) + 1, goal_y = random.nextInt(HEIGHT + 1) + 1;
                 pw.println(start_x + " " + start_y);

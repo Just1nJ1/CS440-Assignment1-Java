@@ -9,6 +9,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -19,7 +20,12 @@ public class GridDisplay extends Application {
     public static void main(String[] args) {
         System.out.println("Input Grid file: ");
         String filename = sc.nextLine();
-        m = new Main(filename);
+        try {
+            m = new Main(filename);
+        } catch (IOException e) {
+            System.err.println("Cannot Read given file");
+            return;
+        }
         System.out.println("Which Algorithm? (\"a\" for a star; \"theta\" for theta star)");
         String algo = sc.nextLine();
         List<Node> path = m.algo("theta".equals(algo));
@@ -62,7 +68,8 @@ public class GridDisplay extends Application {
                             + "\nh = " + (nb.n.getH_value() == Double.MAX_VALUE ? "Infinity"
                             : String.format("%.3f", nb.n.getH_value()))
                             + "\nf = " + (nb.n.getG_value() == Double.MAX_VALUE | nb.n.getH_value() == Double.MAX_VALUE
-                            ? "Infinity" : String.format("%.3f", nb.n.getG_value() + nb.n.getH_value())));
+                            ? "Infinity" : String.format("%.3f", nb.n.getG_value() + nb.n.getH_value()))
+                            + "\nParent Node: (" + (nb.n.getParent().getX() + 1) + ", " + (nb.n.getParent().getY() + 1) + ")");
                     a.show();
                 });
                 matrix[i][j].setMinWidth(40);
@@ -78,7 +85,25 @@ public class GridDisplay extends Application {
                 recs[i][j] = new Rectangle();
                 recs[i][j].setWidth(40);
                 recs[i][j].setHeight(40);
-                recs[i][j].setFill(m.blocked[i + 1][j + 1] == 0 ? Color.WHITE : Color.DARKGRAY);
+                if (m.blocked[i + 1][j + 1] == 0) {
+                    recs[i][j].setFill(Color.LIGHTGRAY);
+                } else {
+                    recs[i][j].setFill(Color.BLACK);
+                    if (m.blocked[i + 2][j + 1] == 1) {
+                        Rectangle tmp = new Rectangle();
+                        tmp.setWidth(40);
+                        tmp.setHeight(40);
+                        tmp.setFill(Color.BLACK);
+                        root.add(tmp, 2 * (j + 1), 2 * (i + 1) + 1);
+                    }
+                    if (m.blocked[i + 1][j + 2] == 1) {
+                        Rectangle tmp = new Rectangle();
+                        tmp.setWidth(40);
+                        tmp.setHeight(40);
+                        tmp.setFill(Color.BLACK);
+                        root.add(tmp, 2 * (j + 1) + 1, 2 * (i + 1));
+                    }
+                }
                 root.add(recs[i][j], 2 * (j + 1), 2 * (i + 1));
             }
         }
