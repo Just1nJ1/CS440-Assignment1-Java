@@ -4,15 +4,15 @@ import java.util.*;
 
 
 public class Main {
-    public static int WIDTH = 100, HEIGHT = 50;
-    public static int START_X, START_Y, GOAL_X, GOAL_Y;
-    public static Node[][] nodes;
-    public static int[][] blocked;
-    public static Random r = new Random(37);
-    public static MathContext m = new MathContext(1);
+    public int WIDTH = 100, HEIGHT = 50;
+    public int START_X, START_Y, GOAL_X, GOAL_Y;
+    public Node[][] nodes;
+    public int[][] blocked;
+    public Random r = new Random(37);
+    public MathContext m = new MathContext(1);
     public static Scanner sc = new Scanner(System.in);
 
-    public static int[][] read_grids(String filename){
+    public int[][] read_grids(String filename){
         int[][] blocked = null;
         try (BufferedReader br = new BufferedReader(new FileReader(filename))){
             String[] start = br.readLine().split(" ");
@@ -48,7 +48,7 @@ public class Main {
         return blocked;
     }
 
-    public static String[] formatted() {
+    public String[] formatted() {
         String[][] vertices = new String[HEIGHT + 1][WIDTH + 1];
         for (int i = 0; i < HEIGHT + 1; i++) {
             for (int j = 0; j < WIDTH + 1; j++) {
@@ -63,7 +63,7 @@ public class Main {
         return result;
     }
 
-    public static void print_grid(){
+    public void print_grid(){
         String[] lines = formatted();
         System.out.print("\t");
         for (int i = 1; i <= WIDTH + 1; i++)
@@ -86,7 +86,7 @@ public class Main {
         System.out.printf("%d\t " + lines[HEIGHT] + "\n", HEIGHT + 1);
     }
 
-    public static void print_grid(String filename){
+    public void print_grid(String filename){
         try {
             PrintWriter pw = new PrintWriter(new FileWriter(filename));
             String[] lines = formatted();
@@ -115,7 +115,7 @@ public class Main {
         }
     }
 
-    public static List<Node> algo(boolean theta){
+    public List<Node> algo(boolean theta){
         Node start = nodes[START_Y - 1][START_X - 1];
         start.setG_value(0);
         start.setParent(start);
@@ -150,7 +150,7 @@ public class Main {
         return null;
     }
 
-    public static List<Node> successor(Node s){
+    public List<Node> successor(Node s){
         int x = s.getX(), y = s.getY();
         List<Node> result = new ArrayList<>();
         for (int i = 0; i < 8; i ++){
@@ -177,7 +177,7 @@ public class Main {
      * @param direction 0 - right; 1 - upper-right; 2 - upper... (Counterclockwise)
      * @return true if path is valid
      */
-    public static boolean check(int x, int y, int direction) {
+    public boolean check(int x, int y, int direction) {
         return switch (direction) {
             case 0 -> x != WIDTH && blocked[y][x + 1] + blocked[y + 1][x + 1] != 2;
             case 1 -> x != WIDTH && y != 0 && blocked[y][x + 1] != 1;
@@ -191,7 +191,7 @@ public class Main {
         };
     }
 
-    public static void update_vertex_a_star(Node s, Node s_, MinHeap fringe){
+    public void update_vertex_a_star(Node s, Node s_, MinHeap fringe){
         if (s.getG_value() + c(s, s_) < s_.getG_value()) {
             s_.setG_value(s.getG_value() + c(s, s_));
             s_.setParent(s);
@@ -202,7 +202,7 @@ public class Main {
         }
     }
 
-    public static void update_vertex_theta_star(Node s, Node s_, MinHeap fringe){
+    public void update_vertex_theta_star(Node s, Node s_, MinHeap fringe){
         if (line_of_sight(s.getParent(), s_)) {
             if (s.getParent().getG_value() + c(s.getParent(), s_) < s_.getG_value()) {
                 s_.setG_value(s.getParent().getG_value() + c(s.getParent(), s_));
@@ -217,17 +217,17 @@ public class Main {
         }
     }
 
-    public static double c(Node s, Node s_){
+    public double c(Node s, Node s_){
         return Math.sqrt(Math.pow(s.getX() - s_.getX(), 2) + Math.pow(s.getY() - s_.getY(), 2));
     }
 
-    public static double h(Node s_){
+    public double h(Node s_){
         return Math.sqrt(2) * Math.min(Math.abs(s_.getX() - (GOAL_X - 1)), Math.abs(s_.getY() - (GOAL_Y - 1)))
                 + Math.max(Math.abs(s_.getX() - (GOAL_X - 1)), Math.abs(s_.getY() - (GOAL_Y - 1)))
                 - Math.min(Math.abs(s_.getX() - (GOAL_X - 1)), Math.abs(s_.getY() - (GOAL_Y - 1)));
     }
 
-    public static boolean line_of_sight(Node s, Node s_){
+    public boolean line_of_sight(Node s, Node s_){
         int x0 = s.getX();
         int y0 = s.getY();
         int x1 = s_.getX();
@@ -279,7 +279,7 @@ public class Main {
         return true;
     }
 
-    public static void init_nodes(Node[][] nodes){
+    public void init_nodes(Node[][] nodes){
         for (int y = 0; y < HEIGHT + 1; y++)
             for (int x = 0; x < WIDTH + 1; x++) {
 //                nodes[y][x] = new Node(x, y, new BigDecimal(r.nextDouble(), m).doubleValue(), new BigDecimal(r.nextDouble(), m).doubleValue(), null);
@@ -287,14 +287,14 @@ public class Main {
             }
     }
 
-    public static void query_point(int node_x, int node_y){
+    public void query_point(int node_x, int node_y){
         if (node_x > 0 && node_x <= WIDTH + 1 && node_y > 0 && node_y <= HEIGHT + 1){
             Node n = nodes[node_y - 1][node_x - 1];
             System.out.printf("Vertex at %d, %d has g=%.2e, h=%.2e, f=%.2e\n", node_x, node_y, n.getG_value(), n.getH_value(), n.getG_value() + n.getH_value());
         }
     }
 
-    public static void input_handler(){
+    public void input_handler(){
         String line;
         System.out.println("Type \"query\" to see vertex's values \nType \"quit\" when stop query");
         while ((line = sc.nextLine()) != null && !"quit".equals(line)){
@@ -351,44 +351,45 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        MinHeap heap = new MinHeap();
-//        m.push(new Node(0, 0, 0, 1, null));
-//        m.push(new Node(0, 0, 1, 1, null));
-//        m.push(new Node(0, 0, 2, 0, null));
-//        m.push(new Node(0, 0, 0, 0, null));
-//        m.push(new Node(0, 0, 2, 4, null));
-//        m.push(new Node(0, 0, 2, 2, null));
-//        m.push(new Node(0, 0, 2, 5, null));
-//        m.push(new Node(0, 0, 0, 3, null));
-//        Node n;
-//        while ((n = m.pop()) != null)
-//            System.out.println(n.getG_value() + ", " + n.getH_value());
-        blocked = read_grids("src/Grids/0.txt");
-        nodes = new Node[HEIGHT + 1][WIDTH + 1];
-        init_nodes(nodes);
-//        for (Node[] ns : nodes)
-//            for (Node n : ns)
-//                heap.push(n);
-//        Node n;
-//        heap.remove(nodes[1][1]);
-//        while ((n = heap.pop()) != null)
-//            System.out.println(n.getG_value() + ", " + n.getH_value() + ", " + (n.getG_value() + n.getH_value()));
-        List<Node> path = algo(true);
-        if (path != null)
+        System.out.println("Input Grid file: ");
+        String filename = sc.nextLine();
+//        blocked = read_grids(filename);
+//        nodes = new Node[HEIGHT + 1][WIDTH + 1];
+//        init_nodes(nodes);
+//        List<Node> path = algo(false);
+//        if (path != null) {
+//            System.out.printf("Start (%d, %d) -> ", START_X, START_Y);
+//            for (Node n : path)
+//                System.out.print(n + " -> ");
+//            System.out.printf("(%d, %d) Goal\n", GOAL_X, GOAL_Y);
+//            print_grid();
+//            print_grid("src/Outputs/0.txt");
+//            input_handler();
+//        } else {
+//            System.out.println("There is no valid path exist.");
+//        }
+        Main m = new Main(filename);
+        List<Node> path = m.algo(false);
+        if (path != null) {
+            System.out.printf("Start (%d, %d) -> ", m.START_X, m.START_Y);
             for (Node n : path)
-                System.out.println(n);
-//        List<Node> path2 = algo(false);
-//        if (path2 != null)
-//            for (Node n : path2)
-//                System.out.println((n.getX() + 1) + ", " + (n.getY() + 1));
-        System.out.println("======================================");
-//        test();
-        print_grid();
-        print_grid("src/Outputs/0.txt");
-        input_handler();
+                System.out.print(n + " -> ");
+            System.out.printf("(%d, %d) Goal\n", m.GOAL_X, m.GOAL_Y);
+            m.print_grid();
+            m.print_grid(filename + ".out");
+//            input_handler();
+        } else {
+            System.out.println("There is no valid path exist.");
+        }
     }
 
-    public static void test(){
+    public Main(String filename){
+        blocked = read_grids(filename);
+        nodes = new Node[HEIGHT + 1][WIDTH + 1];
+        init_nodes(nodes);
+    }
+
+    public void test(){
         Node n = nodes[1][2];
         for (Node na : successor(n))
             System.out.println(na.getX() + ", " + na.getY());

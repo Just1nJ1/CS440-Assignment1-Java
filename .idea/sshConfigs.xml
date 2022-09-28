@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SshConfigs">
+    <configs>
+      <sshConfig authType="PASSWORD" host="ilab.cs.rutgers.edu" id="5e907963-5f04-4e24-a37e-afd8595df4b1" port="22" nameFormat="DESCRIPTIVE" username="hj297" />
+    </configs>
+  </component>
+</project>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="db3db362-c926-44e2-82d6-d54afa29e66d" name="ilab">
+        <fileTransfer rootFolder="/common/home/hj297/cs440" accessType="SFTP" host="ilab.cs.rutgers.edu" port="22" sshConfigId="5e907963-5f04-4e24-a37e-afd8595df4b1" sshConfig="hj297@ilab.cs.rutgers.edu:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
