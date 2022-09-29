@@ -126,6 +126,26 @@ public class GridDisplay extends Application {
             root.add(tmp, 0, 2 * i + 1);
         }
 
+        for (int i = 0; i < width; i++) {
+            if (m.blocked[1][i + 1] == 1) {
+                Rectangle tmp = new Rectangle();
+                tmp.setWidth(40);
+                tmp.setHeight(40);
+                tmp.setFill(Color.BLACK);
+                root.add(tmp, 2 * (i + 1), 1);
+            }
+        }
+
+        for (int i = 0; i < height; i++) {
+            if (m.blocked[i + 1][1] == 1) {
+                Rectangle tmp = new Rectangle();
+                tmp.setWidth(40);
+                tmp.setHeight(40);
+                tmp.setFill(Color.BLACK);
+                root.add(tmp, 1, 2 * (i + 1));
+            }
+        }
+
         ScrollPane sp = new ScrollPane();
         sp.setContent(root);
 
